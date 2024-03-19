@@ -44,7 +44,7 @@ class ApiBaseHelper {
         default:
       }
     } on DioException catch (error) {
-      error.response;
+      response = error.response;
     }
     return response;
   }
@@ -61,7 +61,8 @@ class CookieStorage extends Interceptor {
       if(response.requestOptions.path == UrlHelper.loginUrl) {
         List<String>? cookies = response.headers[HttpHeaders.setCookieHeader];
         cookies?.forEach((element) {
-          Storage.write("cookie", element);
+          String cookie = element.split(";")[0];
+          Storage.write("cookie", cookie);
         });
       }
   }
@@ -70,8 +71,11 @@ class CookieStorage extends Interceptor {
 class CustomHeader extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
-    final cookie = await Storage.read("cookie");
-    options.headers[HttpHeaders.cookieHeader] = cookie;
+    if (options.path != UrlHelper.loginUrl) {
+      final cookie = await Storage.read("cookie");
+      options.headers[HttpHeaders.cookieHeader] = cookie;
+    }
+    options.headers[HttpHeaders.hostHeader] = "shareittofriends.com";
     return super.onRequest(options, handler);
   }
 }

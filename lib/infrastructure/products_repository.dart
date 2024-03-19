@@ -11,8 +11,7 @@ class ProductsRepository extends IProductsRepository {
   Future<Either<String, List<ProductItem>>> fetchProducts() async {
     try {
       String? userLoginToken = await Storage.read("token");
-      String? token = await Storage.read("cookie");
-      if (token != null) {
+      if (userLoginToken != null) {
         final formData = FormData.fromMap({
           "user_login_token": userLoginToken,
         });
@@ -20,7 +19,6 @@ class ProductsRepository extends IProductsRepository {
             url: UrlHelper.fetchProductUrl,
             method: HTTPMethod.post,
             data: formData,
-            headers: {"Authorization": "Bearer $token"}
         );
         if (response != null) {
           final resList = response.data as List;
